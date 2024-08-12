@@ -1,0 +1,22 @@
+---
+- name: All pg tasks
+  hosts: BucketServer
+  become: yes
+  tasks:
+
+#Variables configuration
+  - name: Include general variables
+    include_vars:
+      file: miniovars.yml
+    tags:
+      - minio
+
+#MinIo Installation
+
+- hosts: BucketServer
+  tasks:
+  - name: Install MinIO
+    include_tasks: minio.yml
+    tags:
+      - minio
+

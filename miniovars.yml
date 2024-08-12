@@ -1,0 +1,4 @@
+minio_data        : "/data"
+minio_root_dir    : "/root/.minio"
+mioio_certs_dir   : "{{ minio_root_dir }}/certs"    
+mioio_exe_dir     : "/root"

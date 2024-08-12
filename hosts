@@ -1,0 +1,8 @@
+[allpg]
+192.168.11.91 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
+192.168.11.92 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
+192.168.11.93 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12 
+192.168.11.94 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12 
+
+[BucketServer]
+192.168.11.94 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12 

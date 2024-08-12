@@ -1,0 +1,61 @@
+# INSTALL MinIO
+
+  - name: Install utilities
+    become: yes
+    become_user: root
+    apt:
+      pkg:
+       - wget
+      state: present
+      update_cache: yes
+
+  - name: Make data directory
+    become: yes
+    become_user: root
+    file:
+      path: "{{ minio_data }}"
+      state: directory
+
+  - name: Make .minio directory
+    become: yes
+    become_user: root
+    file:
+      path: "{{ minio_root_dir }}"
+      state: directory
+
+  - name: Make certs directory
+    become: yes
+    become_user: root
+    file:
+      path: "{{ mioio_certs_dir }}"
+      state: directory
+  
+  - name: Copy private key
+    become: yes
+    become_user: root
+    copy:
+     owner: root
+     group: root
+     mode: 0600
+     src: "./pg-minio/certs/private.key"
+     dest: "{{ mioio_certs_dir }}/private.key"
+
+  - name: Copy self signed certificate
+    become: yes
+    become_user: root
+    copy:
+     owner: root
+     group: root
+     mode: 0644
+     src: "./pg-minio/certs/public.crt"
+     dest: "{{ mioio_certs_dir }}/public.crt"
+
+  - name: Install MinIO 
+    become: yes
+    become_user: root
+    copy:
+     owner: root
+     group: root
+     mode: 0655
+     src: "./pg-minio/exe/minio"
+     dest: "{{ mioio_exe_dir }}/minio"

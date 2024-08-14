@@ -1,11 +1,11 @@
 pg_version                        : 16
-ubuntu_version                    : "jammy"
-bebedb-dev1                       : "192.168.11.91"  
-bebedb-dev2                       : "192.168.11.92" 
-pg_data_directory                 : /var/lib/postgresql/{{ pg_version }}/main
+ubuntu_version                    : "noble"
+pg_user_home                      : "/var/lib/postgresql"
+pg_data_directory                 : "{{ pg_user_home }}/{{ pg_version }}/main"
 pg_extra_conf_directory           : "{{ pg_data_directory }}/conf.d"
-pg_directory                      : /var/lib/postgresql/{{ pg_version }}
+pg_directory                      : "{{ pg_user_home }}/{{ pg_version }}"
 pg_conf_directory                 : /etc/postgresql/{{ pg_version }}/main/conf.d 
 pg_postgresql_conf_dir            : /etc/postgresql/{{ pg_version }}/main 
 pg_password                       : "pgdev"
-pgbacrest_version                 : "2.53"
+pg_user                           : "postgres"
+pgbackrest_version                : "2.53-1.pgdg24.04+1"

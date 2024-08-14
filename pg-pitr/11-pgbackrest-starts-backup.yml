@@ -1,0 +1,21 @@
+# Create pgbackrest stanzas
+  - name: Create pgbackrest stanzas
+    become : yes
+    become_user: root
+    shell:
+      cmd: su - "{{ pg_backrest_user }}" -c "pgbackrest --stanza {{ item }} stanza-create"
+    #debug:
+    #    msg: "Elemento corrente: {{ item }}"
+    with_items:
+      - "{{ stanzas }}"
+
+# Make first backup
+  - name: make first backup
+    become : yes
+    become_user: root
+    shell:
+      cmd: su - "{{ pg_backrest_user }}" -c "pgbackrest --stanza {{ item }} backup"
+    #debug:
+    #    msg: "Elemento corrente: {{ item }}"
+    with_items:
+      - "{{ stanzas }}"

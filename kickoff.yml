@@ -5,7 +5,7 @@
   tasks:
 
 #Variables configuration
-  - name: Include general variables
+  - name: Include general variables MinIo
     include_vars:
       file: miniovars.yml
     tags:
@@ -13,10 +13,88 @@
 
 #MinIo Installation
 
-- hosts: BucketServer
-  tasks:
   - name: Install MinIO
     include_tasks: minio.yml
     tags:
       - minio
+
+# POSTGRESQL SERVERS
+- hosts: allpg
+  tasks:
+
+  - name: Include general variables PostgreSQL/PITR
+    include_vars:
+      file: pgvars.yml
+    tags:
+      - postgresql
+
+
+  - name: Kernel configuration 
+    include_tasks: kernel.yml
+    tags:
+      - postgresql
+
+  - name: Add PostgreSQL Repository 
+    include_tasks: pgrepo.yml
+    tags:
+      - postgresql
+
+  - name: Postgresql Install
+    include_tasks: pginstall.yml
+    tags:
+      - postgresql
+
+#POINT IN TIME RECOVERY
+
+- hosts: allpg
+  tasks:
+
+  - name: Include general variables PosostgreSQL/PITR
+    include_vars:
+      file: pgvars.yml
+    tags:
+      - pitr
+
+  - name: Add PostgreSQL Repository 
+    include_tasks: pgrepo.yml
+    tags:
+      - pitr
+
+  - name: PgBackRest Install
+    include_tasks: pg-pitr/01-pgbackrest.yml
+    tags:
+      - pitr
+
+- hosts: pgbackrest
+  tasks:
+
+  - name: Include general variables PosostgreSQL/PITR
+    include_vars:
+      file: pgvars.yml
+    tags:
+      - pitr
+
+  - name: Fetch the PgBackrest server key
+    include_tasks: pg-pitr/02-pgbackrest-fetch-keys.yml
+    tags:
+      - pitr
+  
+- hosts: allpg
+  tasks:
+    
+  - name: Include general variables PosostgreSQL/PITR
+    include_vars:
+      file: pgvars.yml
+    tags:
+      - pitr
+
+  - name: Fetch all Postgresql server key
+    include_tasks: pg-pitr/03-allpg-fetch-keys.yml
+    tags:
+      - pitr
+
+  - name: Copy pgbackrest key to pg servers
+    include_tasks: pg-pitr/04-pgbackrest-copy-keys.yml
+    tags:
+      - pitr
 

@@ -1,0 +1,11 @@
+  - name: Copy pgbackrest key to pg servers
+    become: yes
+    become_user: root
+    authorized_key:
+      user: "{{ pg_user }}"
+      state: present
+      key: "{{ lookup('file','keys/pgbackrest/{{item}}-id_rsa.pub')}}"
+    with_items:
+      - "{{ groups['pgbackrest'] }}"  
+    tags:
+      - pitr

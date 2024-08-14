@@ -1,0 +1,21 @@
+# Pgbackrest conf
+#  - name: Copy bucket key
+#    become: yes
+#    become_user: root
+#    copy:
+#     owner: postgres
+#     group: postgres
+#     mode: 0664
+#     src: "pgbackrest-templates/pgbackrest-key.json"
+#     dest: "/etc/pgbackrest-key.json"
+
+  # Pgbackrest copy specific files
+  - name:  Create pgbackrest.conf on pgbackrest server
+    become: yes
+    become_user: root
+    template:
+      src   : pgbackrest-templates/pgbackrest-main-conf.j2
+      dest  : /etc/pgbackrest.conf
+      owner : "{{ pg_backrest_user }}"
+      group : "{{ pg_user }}"
+      mode  : 0644

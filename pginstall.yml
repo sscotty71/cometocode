@@ -1,0 +1,35 @@
+#LOCALE it-UTF-8
+  - name: Locale it-UTF-8
+    become: yes
+    become_user: root
+    locale_gen:
+      name: it_IT.UTF-8
+      state: present
+    tags:
+      - postgresql
+
+ # Packages install
+
+  - name: PostgreSQL Install
+    become: yes
+    become_user: root
+    apt:
+      pkg:
+       - "postgresql-{{ pg_version }}"
+       - "postgresql-client-{{ pg_version }}"
+       - "postgresql-{{ pg_version }}-repack"
+       - "postgresql-{{ pg_version }}-ip4r"
+       - sysstat
+       - net-tools
+       - htop
+       - vim
+       - apt-utils
+       - screen
+       - tmux
+       - sudo
+       - locales
+      state: present
+      update_cache: yes
+    tags:
+      - postgresql
+ 

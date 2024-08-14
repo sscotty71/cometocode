@@ -1,0 +1,18 @@
+  - name: Insert the backup host into the known_hosts
+    become: yes
+    become_user: root
+    command: su - postgres -c "ssh-keyscan -H {{ item }} >> ~/.ssh/known_hosts"
+    with_items: 
+      - "{{ groups['allpg'] }}"
+    tags:
+      - pitr
+
+  - name: Change ownership know hosts
+    become: yes
+    become_user: root
+    file:
+      path: "{{ pg_user_home }}/.ssh/known_hosts"
+      owner: "{{ pg_user }}"
+      group: "{{ pg_user }}"
+    tags:
+      - pitr

@@ -1,0 +1,55 @@
+# Kernel options
+  - name:  Swappiness option
+    become: yes
+    become_user: root
+    sysctl:
+     name: vm.swappiness
+     value: '0'
+     state: present
+     reload: yes
+    tags:
+      - postgresql
+
+  - name:  overcommit_memory option
+    become: yes
+    become_user: root
+    sysctl:
+     name: vm.overcommit_memory
+     value: '2'
+     state: present
+     reload: yes
+    tags:
+      - postgresql
+
+  - name:  overcommit_ratio option
+    become: yes
+    become_user: root
+    sysctl:
+     name: vm.overcommit_ratio
+     value: '90'
+     state: present
+     reload: yes
+    tags:
+      - postgresql
+
+  - name:  dirty_background_ratio option
+    become: yes
+    become_user: root
+    sysctl:
+     name: vm.dirty_background_ratio
+     value: '90'
+     state: present
+     reload: yes
+    tags:
+      - postgresql
+
+  - name:  dirty_expire_centisecs option
+    become: yes
+    become_user: root
+    sysctl:
+     name: vm.dirty_expire_centisecs
+     value: '499'
+     state: present
+     reload: yes
+    tags:
+      - postgresql

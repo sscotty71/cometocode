@@ -1,0 +1,30 @@
+# Setting crontabs
+  - name: Create cron entries to do the full backup(s)
+    become : yes
+    become_user: root
+    cron:
+      name: "pgbackrest FULL backup for {{ item.1 }}"
+      disabled: no
+      hour:   "{{0 + item.0 * 2}}"
+      minute: "0"
+      weekday: "0"
+      user: "{{ pg_backrest_user }}"
+      state: present
+      job: "pgbackrest --stanza={{ item.1 }} --type=full backup"
+    with_indexed_items:
+      - "{{ stanzas }}"
+
+  - name: Create cron entries to do the full backup(s)
+    become : yes
+    become_user: root
+    cron:
+      name: "pgbackrest INCREMENTAL backup for {{ item.1 }}"
+      disabled: no
+      hour:   "{{0 + item.0 * 2}}"
+      minute: "0"
+      weekday: "1,2,3,4,5,6"
+      user: "{{ pg_backrest_user }}"
+      state: present
+      job: "pgbackrest --stanza={{ item.1 }} --type=incr backup"
+    with_indexed_items:
+      - "{{ stanzas }}"

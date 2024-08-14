@@ -1,0 +1,10 @@
+ #Fetch key ssl from pg
+  - name: Fetch the PgBackrest server key
+    become: yes
+    become_user: root
+    fetch:
+      src: "{{ pg_user_home }}/.ssh/id_rsa.pub"
+      dest: "keys/pgbackrest/{{ ansible_ssh_host }}-id_rsa.pub"
+      flat: yes
+    tags:
+      - pitr

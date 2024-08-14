@@ -1,0 +1,28 @@
+# Packages install
+  - name: Install Pgbackrest Version {{ pgbackrest_version }}
+    become: yes
+    become_user: root
+    apt:
+      name: pgbackrest={{ pgbackrest_version }}
+      state: present
+      update_cache: yes
+    tags:
+      - pitr
+
+#Check user
+  - name: Check {{ pg_user }} user account
+    become: yes
+    become_user: root
+    user:
+      name: "{{ pg_user }}"
+      comment: PostgreSQL account user
+      generate_ssh_key: yes
+      ssh_key_file: .ssh/id_rsa
+      force : no
+      shell: /bin/sh
+      groups:
+      - postgres
+      - ssl-cert
+      - adm
+    tags:
+      - pitr

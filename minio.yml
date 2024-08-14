@@ -83,7 +83,7 @@
     copy:
      owner: minio-user
      group: minio-user
-     mode: 0655
+     mode: 0755
      src: "./pg-minio/exe/minio"
      dest: "{{ mioio_exe_dir }}/minio"
 
@@ -94,7 +94,19 @@
     become_user: root
     template:
      src:  "pg-minio/conf/minio.conf.j2"
-     dest: "{{mioio_conf_file }}"
-     owner: minio-user
-     group: minio-user
+     dest: "{{ conf_mioio_conf_file }}"
+#     owner: minio-user
+#     group: minio-user
+     mode: '0644'
+
+## Service from templates
+
+  - name: Create minio.service
+    become: yes
+    become_user: root
+    template:
+     src:  "pg-minio/service/minio.service.j2"
+     dest: "{{ service_minio_filepath }}"
+#     owner: minio-user
+#     group: minio-user
      mode: '0644'

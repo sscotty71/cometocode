@@ -1,0 +1,13 @@
+[global]
+backup-host={{ pg_backrest_host }}
+backup-user= {{ pg_user }}
+log-level-console= {{ log_level_console }}
+log-level-file= {{ log_level_file }}
+
+{% for record in records %}
+{% if ansible_host == pghosts[record] %}
+[{{ stanzas[record] }}]
+{% endif %}
+{% endfor %}
+pg1-path = {{ pg_data_directory }}
+pg1-port = 5432

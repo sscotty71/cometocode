@@ -1,0 +1,7 @@
+{% for record in records %}
+{% if ansible_host == pghosts[record] %}
+archive_command = 'pgbackrest --pg1-path {{ pg_data_directory }}  --stanza {{ stanzas[record] }} archive-push %p'
+{% endif %}
+{% endfor %}
+archive_mode    = on
+wal_level       = {{ pg_wal_level }}

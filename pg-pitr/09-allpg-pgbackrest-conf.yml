@@ -1,23 +1,26 @@
-  # Pgbackrest copy specific files
-  - name:  Adjust postgresql.conf for postgresql servers
+  - name: pgbackrest.conf for postgresql server
     become: yes
     become_user: root
     template:
-      src   : pgbackrest-templates/pgbackrest.pg.j2
-      dest  : /etc/pgbackrest.conf
-      owner : "{{ pg_backrest_user }}"
-      group : "{{ pg_user }}"
-      mode  : 0644
+     src:  "pg-pitr/pgbackrest.pg.j2"
+     dest: "{{ path_pgbackrest_file_conf }}"
+     owner: "{{ pg_backrest_user }}"
+     group: "{{ pg_user }}"
+     mode: '0644'
+    tags:
+      - pitr
 
   - name:  Adjust postgresql.conf for postgresql servers
     become: yes
     become_user: root
     template:
-      src   : pgbackrest-templates/include_pgbackrest.j2
+      src   : pg-pitr/include_pgbackrest.j2
       dest  : "{{ pg_conf_directory }}/pgbackrest.conf"
       owner : "{{ pg_user }}"
       group : "{{ pg_user }}"
       mode  : 0644
+    tags:
+      - pitr
 
 ### Add to Postgresql.conf
   - name: Insert the pgbackrest.conf module on postgresql.conf file
@@ -26,6 +29,8 @@
     lineinfile:
       path: "{{ pg_postgresql_conf_dir }}/postgresql.conf"
       line: include_if_exists 'conf.d/pgbackrest.conf'
+    tags:
+      - pitr
 
 # PostgreSQL restart
   - name: Restart postgresql
@@ -34,4 +39,4 @@
     shell: service postgresql restart
     args:
      executable: /bin/bash
-    tags: postgresql_restart
+    tags: pitr

@@ -1,4 +1,4 @@
-  - name: Insert the backup host into the known_hosts
+  - name: Insert the backup host into the known_hosts PGbackRest <- Ps(s)
     become: yes
     become_user: root
     command: su - postgres -c "ssh-keyscan -H {{ item }} >> ~/.ssh/known_hosts"

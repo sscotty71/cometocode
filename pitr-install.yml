@@ -1,9 +1,0 @@
-  - name: PgBackRest Install
-    include_tasks: pg-pitr/01-pgbackrest.yml
-    tags:
-      - pitr
-
-  - name: Fetch the PgBackrest server key
-    include_tasks: pg-pitr/02-pgbackrest-fetch-keys.yml
-    tags:
-      - pitr

@@ -46,10 +46,12 @@
 
 #POINT IN TIME RECOVERY
 
-- hosts: allpg
+#################### INSTALL PGBACKREST ####################  
+
+- hosts: allpgandpitr
   tasks:
 
-  - name: Include general variables PosostgreSQL/PITR
+  - name: Include general variables PostgreSQL/PITR
     include_vars:
       file: pgvars.yml
     tags:
@@ -60,29 +62,48 @@
     tags:
       - pitr
 
+
   - name: PgBackRest Install
     include_tasks: pg-pitr/01-pgbackrest.yml
     tags:
       - pitr
 
-- hosts: pgbackrest
-  tasks:
+#################### KEYS PAIR GENERATION ####################  
 
-  - name: Include general variables PosostgreSQL/PITR
+  - name: Include general variables PostgreSQL/PITR
     include_vars:
       file: pgvars.yml
     tags:
       - pitr
 
+  - name: PgBackRest Install
+    include_tasks: pg-pitr/00-pgbackrest-keys.yml
+    tags:
+      - pitr
+
+
+#################### KEYS PAIR GENERATION ####################  
+
+- hosts: pgbackrest
+  tasks:
+
+  - name: Include general variables PostgreSQL/PITR
+    include_vars:
+      file: pgvars.yml
+    tags:
+      - pitr
+
+#################### FETCH AND COPY  KEY -> AUTORIZED KEYS  AND KNOW HOSTS ####################
+
   - name: Fetch the PgBackrest server key
     include_tasks: pg-pitr/02-pgbackrest-fetch-keys.yml
     tags:
       - pitr
-  
+
 - hosts: allpg
   tasks:
     
-  - name: Include general variables PosostgreSQL/PITR
+  - name: Include general variables PostgreSQL/PITR
     include_vars:
       file: pgvars.yml
     tags:
@@ -95,6 +116,53 @@
 
   - name: Copy pgbackrest key to pg servers
     include_tasks: pg-pitr/04-pgbackrest-copy-keys.yml
+    tags:
+      - pitr
+
+  - name: Insert the backup host into the known_hosts Pg(s) <- PgBackrest
+    include_tasks: pg-pitr/07-allpg-knowhosts.yml
+    tags:
+      - pitr
+
+- hosts: pgbackrest
+  tasks:
+
+  - name: Set Know hosts file on pgbackrest
+    include_tasks: pg-pitr/05-allpg-copy-keys.yml
+    tags:
+      - pitr
+
+  - name: Insert the backup host into the known_hosts PGbackRest <- Ps(s)
+    include_tasks: pg-pitr/06-pgbackrest-knowhosts.yml
+    tags:
+      - pitr
+
+### GENERATE pgbackrest.conf for pabackrest server 
+
+ # - name: pgbackrest.conf for pabackrest server
+ #   become: yes
+ #   become_user: root
+ #   template:
+ #    src:  "pg-pitr/pgbackrest-main-conf.j2"
+ #    dest: "{{ path_pgbackrest_file_conf }}"
+ #    owner: "{{ pg_user }}"
+ #    group: "{{ pg_user }}"
+ #    mode: '0644'
+ #   tags:
+ #     - pitr
+
+  - name: Create pgbackrest.conf on pgbackrest server
+    include_tasks: pg-pitr/08-pgbackrest-conf.yml
+    tags:
+      - pitr
+
+### GENERATE pgbackrest.conf for postgresql primary server
+
+- hosts: pgprimary
+  tasks:
+
+  - name:  pgbackrest.conf for postgresql server and modifify postgresql.conf
+    include_tasks: pg-pitr/09-allpg-pgbackrest-conf.yml
     tags:
       - pitr
 

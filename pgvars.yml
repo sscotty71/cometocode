@@ -1,49 +1,45 @@
-# ----------------- UBUNTU VERSION ------------------
-ubuntu_version                    : "noble"
-#---------------- PostgreSQL ------------------------
-pg_version                        : 16
-pg_user_home                      : "/var/lib/postgresql"
-pg_data_directory                 : "{{ pg_user_home }}/{{ pg_version }}/main"
-pg_extra_conf_directory           : "{{ pg_data_directory }}/conf.d"
-pg_directory                      : "{{ pg_user_home }}/{{ pg_version }}"
-pg_conf_directory                 : /etc/postgresql/{{ pg_version }}/main/conf.d 
-pg_postgresql_conf_dir            : /etc/postgresql/{{ pg_version }}/main 
-pg_password                       : "pgdev"
-pg_user                           : "postgres"
-pg_host_primary                   : "192.168.11.91"
-pg_wal_level                      : "replica"
-#-----------------      PGBACKREST  ----------------------------
-pgbackrest_version                : "2.53-1.pgdg24.04+1"
-pg_backrest_host                  : "192.168.11.92"
-path_pgbackrest_file_conf         : "/etc/pgbackrest.conf"
-pg_backrest_user                  : "{{ pg_user }}"
-#-------------- Bucket TYPE  MinIO -----------------------------
-repo_host                         : "https://192.168.11.95"
-repo1_type                        : "s3"
-repo1_path                        : "/repo"
-repo1_s3_endpoint                 : "{{ repo_host }}"
-repo1_s3_uri_style                : "path"
-repo1_s3_bucket                   : "scottybucket"
-repo1_s3_verify_ssl               : "n"
-repo1_s3_key                      : "fZhaLlDUaREfv2kXDKGY"
-repo1_s3_key_secret               : "8aqPKgXSexoWSCXZIK48cZgJFpMLlZeDbtqiY6ig"
-repo1_s3_region                   : "myregion"
-repo1_storage_host                : "{{ repo_host }}"
-repo1_storage_port                : "9000"
-#-------------- REPO PARAMETERS-----------------------------
-repo1_retention_full              : "2"
-repo1_cipher_type                 : "aes-256-cbc"
-repo1_cipher_pass                 : "SuperSecret"
-#-------------- OTHER PARAMETERS-----------------------------
-process_max                       : "2"
-log_level_console                 : "warn"
-log_level_file                    : "info"
-log_path                          : "/var/log/pgbackrest"
-start_fast                        : "y"
-archive_async                     : "y"
-compress                          : "y"
-compress_level                    : "6"
-# -------------PgBackRest STANZA(s) list ------------------ 
-records                           : [0]
-stanzas                           : ['scottylab-pg-primary']
-pghosts                           : ["{{ pg_host_primary }}"]
+ubuntu_version: noble
+pg_version: "15"
+pg_user_home: /var/lib/postgresql
+pg_data_directory: '{{ pg_user_home }}/{{ pg_version }}/main'
+pg_extra_conf_directory: '{{ pg_data_directory }}/conf.d'
+pg_directory: '{{ pg_user_home }}/{{ pg_version }}'
+pg_conf_directory: /etc/postgresql/{{ pg_version }}/main/conf.d
+pg_postgresql_conf_dir: /etc/postgresql/{{ pg_version }}/main
+pg_password: pgdev
+pg_user: postgres
+pg_host_primary: 192.168.11.91
+pg_wal_level: replica
+pgbackrest_version: 2.53-1.pgdg24.04+1
+pg_backrest_host: 192.168.11.92
+path_pgbackrest_file_conf: /etc/pgbackrest.conf
+pg_backrest_user: '{{ pg_user }}'
+repo_host: https://192.168.11.95
+repo1_type: s3
+repo1_path: /repo
+repo1_s3_endpoint: '{{ repo_host }}'
+repo1_s3_uri_style: path
+repo1_s3_bucket: scottybucket
+repo1_s3_verify_ssl: "n"
+repo1_s3_key: 5lk8GUNsGU45Wc6KSBl7
+repo1_s3_key_secret: IELlsnqZHLCJHj1zzGgBVnGtSVRNWO1ZPaqlXJ9d
+repo1_s3_region: myregion
+repo1_storage_host: '{{ repo_host }}'
+repo1_storage_port: "9000"
+repo1_retention_full: "2"
+repo1_cipher_type: aes-256-cbc
+repo1_cipher_pass: SuperSecret
+process_max: "2"
+log_level_console: warn
+log_level_file: info
+log_path: /var/log/pgbackrest
+start_fast: "y"
+archive_async: "y"
+compress: "y"
+compress_level: "6"
+records:
+    - 0
+stanzas:
+    - pg-primary
+pghosts:
+    - '{{ pg_host_primary }}'

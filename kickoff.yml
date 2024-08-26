@@ -44,6 +44,35 @@
     tags:
       - postgresql
 
+#POSTGRESQL REPLICA
+- hosts: pgprimary
+  tasks:
+
+  - name: Include general variables PostgreSQL/PITR
+    include_vars:
+      file: pgvars.yml
+    tags:
+      - postgresql-replica
+
+  - name: Postgresql Replica Primary
+    include_tasks: pgreplica/pg-primary/pgprimary.yml
+    tags:
+      - postgresql-replica
+
+- hosts: pgsecondary
+  tasks:
+
+  - name: Include general variables PostgreSQL/PITR
+    include_vars:
+      file: pgvars.yml
+    tags:
+      - postgresql-replica
+
+  - name: Postgresql Replica Primary
+    include_tasks: pgreplica/pg-secondary/pgreplica.yml
+    tags:
+      - postgresql-replica
+
 #POINT IN TIME RECOVERY
 
 #################### INSTALL PGBACKREST ####################  

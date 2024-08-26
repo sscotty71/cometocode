@@ -1,0 +1,90 @@
+  # PostgreSQL configuration
+  - name: Copy pg-secondary.conf
+    become: yes
+    become_user: root
+    copy:
+     owner: postgres
+     group: postgres
+     mode: 0664
+     src: "pgreplica/pg-secondary//pg-secondary.conf"
+     dest: "{{ pg_conf_directory }}/pg-secondary.conf"
+    tags:
+      - postgresql-replica
+
+### Add to Postgresql.conf
+  - name: Insert the pg-secondary.conf module on postgresql.conf file
+    become: yes
+    become_user: root
+    lineinfile:
+      path: "{{ pg_postgresql_conf_dir }}/postgresql.conf"
+      line: include_if_exists 'conf.d/pg-secondary.conf' 
+    tags:
+      - postgresql-replica
+
+# PostgreSQL restart
+  - name: Restart postgresql
+    become: yes
+    become_user: root
+    shell: service postgresql restart
+    args:
+     executable: /bin/bash
+    tags:
+      - postgresql-replica
+   
+  - name: Create pgpassfile
+    become: yes
+    become_user: root
+    template:
+     src: pgreplica/pg-secondary/pgpass.j2
+     dest: "{{ pg_user_home }}/.pgpass"
+     owner: postgres
+     group: postgres
+     mode: '0600'
+    tags:
+      - postgresql-replica
+
+  - name: Stop replica server
+    become: yes
+    become_user: root
+    shell: service postgresql stop
+    args:
+     executable: /bin/bash
+    tags:
+      - postgresql-replica
+
+  - name: Rename pg_data
+    become: yes
+    become_user: root
+    shell: rm -rf {{ pg_data_directory }}
+    args:
+     executable: /bin/bash
+    tags:
+      - postgresql-replica
+
+  - name: Create new pg_data dir
+    become: yes
+    become_user: root
+    file:
+     path: "{{ pg_data_directory }}"
+     state: directory
+     owner: postgres
+     group: postgres
+     mode: '0700'
+    tags:
+      - postgresql-replica
+
+  - name: Create replica data
+    become: yes
+    become_user: root
+    command: su - postgres -c "pg_basebackup -U postgres -c fast -h {{ pg_host_primary }} -U  {{ pg_physical_replica_role }} -p 5432 -D {{ pg_data_directory }} -Fp -Xs -P -R -S {{ pg_master_replication_slot }}"
+    tags:
+      - postgresql-replica
+
+  - name: Start replica server
+    become: yes
+    become_user: root
+    shell: service postgresql start
+    args:
+     executable: /bin/bash
+    tags:
+      - postgresql-replica

@@ -1,0 +1,65 @@
+# PostgreSQL configuration
+  - name: Copy pg-primary.conf
+    become: yes
+    become_user: root
+    copy:
+     owner: postgres
+     group: postgres
+     mode: 0664
+     src: "pgreplica/pg-primary//pg-primary.conf"
+     dest: "{{ pg_conf_directory }}/pg-primary.conf"
+    tags:
+      - postgresql-replica
+
+### Add to Postgresql.conf
+  - name: Insert the pg-primary.conf module on postgresql.conf file
+    become: yes
+    become_user: root
+    lineinfile:
+      path: "{{ pg_postgresql_conf_dir }}/postgresql.conf"
+      line: include_if_exists 'conf.d/pg-primary.conf' 
+    tags:
+      - postgresql-replica
+
+  #pghba.conf
+  - name: Create pg_hba.conf
+    become: yes
+    become_user: root
+    template:
+     src:   "pgreplica/pg-primary/pg_hba.conf.j2"
+     dest: "{{ pg_postgresql_conf_dir }}/pg_hba.conf"
+     owner: postgres
+     group: postgres
+     mode: '0644'
+    tags:
+      - postgresql-replica
+
+# PostgreSQL restart
+  - name: Restart postgresql
+    become: yes
+    become_user: root
+    shell: service postgresql restart
+    args:
+     executable: /bin/bash
+    tags:
+      - postgresql-replica
+  
+  #Create master replication slot
+  - name: Copy sql script replication slot
+    become: yes
+    become_user: root
+    template:
+     src: "pgreplica/pg-primary/create_physical_replication_slot.sql.j2"
+     dest: "/tmp/create_physical_replication_slot.sql"
+     owner: postgres
+     group: postgres
+     mode: '0644'
+    tags:
+      - postgresql-replica
+
+  - name: Create db admin user
+    become: yes
+    become_user: root
+    command: su - postgres -c "psql -f /tmp/create_physical_replication_slot.sql postgres"
+    tags:
+      - postgresql-replica

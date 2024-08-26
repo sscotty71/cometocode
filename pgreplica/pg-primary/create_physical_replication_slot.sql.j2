@@ -1,0 +1,4 @@
+create role {{ pg_physical_replica_role }} with replication;
+alter role {{ pg_physical_replica_role }} with password '{{ pg_password }}';
+alter role {{ pg_physical_replica_role }} with login;
+select pg_create_physical_replication_slot('{{ pg_master_replication_slot }}');

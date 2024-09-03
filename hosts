@@ -19,3 +19,5 @@
 [BucketServer]
 192.168.11.95 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
 
+[grafana]
+192.168.11.94 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12

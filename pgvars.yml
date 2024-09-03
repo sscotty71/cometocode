@@ -46,3 +46,4 @@ pghosts:
 pg_host_secondary: 192.168.11.93
 pg_physical_replica_role: replicarole
 pg_master_replication_slot: master
+#-------- GRAFANA -------------

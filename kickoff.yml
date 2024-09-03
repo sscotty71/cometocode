@@ -197,7 +197,7 @@
 
 - hosts: pgbackrest
   tasks:
-  
+
   - name:  PgBackrest cron configuration
     include_tasks: pg-pitr/10-pgbackrest-cron.yml
     tags:
@@ -207,3 +207,18 @@
     include_tasks: pg-pitr/11-pgbackrest-starts-backup.yml
     tags:
       - pitr
+
+- hosts: grafana
+  tasks:
+
+  - name: Include general variables 
+    include_vars:
+      file: pgvars.yml
+    tags:
+      - grafana
+
+  - name:  Grafana
+    include_tasks: grafana/01-grafana-install.yml
+    tags:
+      - grafana
+  

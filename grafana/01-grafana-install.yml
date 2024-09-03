@@ -1,0 +1,63 @@
+  - name: Install prerequisites packages
+    become: yes
+    become_user: root
+    apt:
+      pkg:
+       - apt-transport-https 
+       - software-properties-common
+       - wget
+      state: present
+      update_cache: yes
+    tags:
+      - grafana
+
+  - name: Grafana key directory
+    file:
+      path: /etc/apt/keyrings
+      state: directory
+      mode: '0755'
+    tags:
+      - grafana
+
+  - name: Grafana import key repo - step 1
+    become : yes
+    become_user: root
+    shell:
+      cmd: wget -q -O - https://apt.grafana.com/gpg.key | gpg --dearmor | sudo tee /etc/apt/keyrings/grafana.gpg > /dev/null
+    tags:
+      - grafana
+
+  - name: Grafana import key repo - step 2
+    become : yes
+    become_user: root
+    shell:
+      cmd: echo "deb [signed-by=/etc/apt/keyrings/grafana.gpg] https://apt.grafana.com stable main" | sudo tee -a /etc/apt/sources.list.d/grafana.list
+    tags:
+      - grafana
+
+  - name: Install grafana
+    become: yes
+    become_user: root
+    apt:
+      pkg:
+       - grafana
+      state: present
+      update_cache: yes
+    tags:
+      - grafana
+
+  - name:  Enable Grafana 
+    become : yes
+    become_user: root
+    shell:
+      cmd: systemctl enable grafana-server
+    tags:
+      - grafana
+
+  - name:  Start Grafana
+    become : yes
+    become_user: root
+    shell:
+      cmd: sudo systemctl start grafana-server
+    tags:
+      - grafana

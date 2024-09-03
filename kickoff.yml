@@ -13,10 +13,10 @@
 
 #MinIo Installation
 
-  - name: Install MinIO
-    include_tasks: minio.yml
-    tags:
-      - minio
+#  - name: Install MinIO
+#    include_tasks: minio.yml
+#    tags:
+#      - minio
 
 # POSTGRESQL SERVERS
 - hosts: allpg
@@ -195,3 +195,15 @@
     tags:
       - pitr
 
+- hosts: pgbackrest
+  tasks:
+  
+  - name:  PgBackrest cron configuration
+    include_tasks: pg-pitr/10-pgbackrest-cron.yml
+    tags:
+      - pitr
+
+  - name:  PgBackrest Start Backup
+    include_tasks: pg-pitr/11-pgbackrest-starts-backup.yml
+    tags:
+      - pitr

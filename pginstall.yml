@@ -38,7 +38,7 @@
     become_user: root
     lineinfile:
       path: /etc/hosts
-      line: "{{ pg_host_primary }}  { {pg_primary_hostname }}"
+      line: "{{ pg_host_primary }}  {{ pg_primary_hostname }}"
       state: present
     tags:
         - postgresql

@@ -28,7 +28,6 @@
     tags:
       - postgresql
 
-
   - name: Kernel configuration 
     include_tasks: kernel.yml
     tags:

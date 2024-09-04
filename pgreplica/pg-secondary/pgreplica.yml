@@ -21,6 +21,19 @@
     tags:
       - postgresql-replica
 
+  #pghba.conf
+  - name: Create pg_hba.conf
+    become: yes
+    become_user: root
+    template:
+     src:   "pgreplica/pg-secondary/pg_hba.conf.j2"
+     dest: "{{ pg_postgresql_conf_dir }}/pg_hba.conf"
+     owner: postgres
+     group: postgres
+     mode: '0644'
+    tags:
+      - postgresql-replica
+
 # PostgreSQL restart
   - name: Restart postgresql
     become: yes

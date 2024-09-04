@@ -33,3 +33,32 @@
     tags:
       - postgresql
  
+  - name: Add pg-primary ip to /etc/hosts
+    become: yes
+    become_user: root
+    lineinfile:
+      path: /etc/hosts
+      line: "{{ pg_host_primary }}  { {pg_primary_hostname }}"
+      state: present
+    tags:
+        - postgresql
+
+  - name: Add pg-secondary ip to /etc/hosts
+    become: yes
+    become_user: root
+    lineinfile:
+      path: /etc/hosts
+      line: "{{ pg_host_secondary }}  {{ pg_secondary_hostname }}"
+      state: present
+    tags:
+        - postgresql
+
+  - name: Add grafana ip to /etc/hosts
+    become: yes
+    become_user: root
+    lineinfile:
+      path: /etc/hosts
+      line: "{{ grafana_host }}  {{ grafana_host_name }}"
+      state: present
+    tags:
+        - postgresql

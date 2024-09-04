@@ -1,3 +1,23 @@
+  - name: Add pg-primary ip to /etc/hosts
+    become: yes
+    become_user: root
+    lineinfile:
+      path: /etc/hosts
+      line: "{{ pg_host_primary }}  {{ pg_primary_hostname }}"
+      state: present
+    tags:
+        - grafana
+
+  - name: Add pg-secondary ip to /etc/hosts
+    become: yes
+    become_user: root
+    lineinfile:
+      path: /etc/hosts
+      line: "{{ pg_host_secondary }}  {{ pg_secondary_hostname }}"
+      state: present
+    tags:
+      - grafana   
+
   - name: Install prerequisites packages
     become: yes
     become_user: root
@@ -46,6 +66,18 @@
     tags:
       - grafana
 
+  - name: Copy prechecked grafana db 
+    become: yes
+    become_user: root
+    copy:
+     owner: grafana
+     group: grafana
+     mode: 0640
+     src: "./grafana/db-backup/grafana.db"
+     dest: "/var/lib/grafana/grafana.db"
+    tags:
+      - grafana
+
   - name:  Enable Grafana 
     become : yes
     become_user: root
@@ -53,6 +85,8 @@
       cmd: systemctl enable grafana-server
     tags:
       - grafana
+
+
 
   - name:  Start Grafana
     become : yes

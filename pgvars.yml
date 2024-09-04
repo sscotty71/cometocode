@@ -47,3 +47,7 @@ pg_host_secondary: 192.168.11.93
 pg_physical_replica_role: replicarole
 pg_master_replication_slot: master
 #-------- GRAFANA -------------
+grafana_host: "192.168.11.94"
+grafana_host_name: "grafana"
+pg_primary_hostname: "pg-primary"
+pg_secondary_hostname: "pg-secondary"

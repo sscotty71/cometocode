@@ -1,0 +1,24 @@
+## 
+Ansible hvac problem:
+
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
+
+# Playbook
+
+ansible-playbook -i inventory.yml ansible/zabbix-agent.yml -u stefano -b
+ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=1.23.45 vault_server=127.0.0.1"
+
+vault kv get cometocode-secrets/proxmox
+ pm_api_url 
+ pm_user 
+ pm_password
+ 
+vault kv get cometocode-secrets/zabbix_server
+ dbname 
+ dbuser 
+ dbpassword 
+
+vault kv get cometocode-secrets/zabbix_agent_pg_user
+ username 
+ password

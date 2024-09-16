@@ -1,0 +1,32 @@
+- hosts: monitor
+  become: yes
+
+  roles:
+     - role: klonet.preparatory
+     - role: geerlingguy.postgresql
+     - role: geerlingguy.apache
+       apache_remove_default_vhost: true
+       apache_create_vhosts: false  
+     - role: geerlingguy.php
+     - role: pausa
+     - role: community.zabbix.zabbix_server
+       zabbix_server_dbtype: postgresql
+       zabbix_server_dbhost: localhost
+
+       zabbix_server_dbname: "{{ zabbix_dbname }}"
+       zabbix_server_dbuser: "{{ zabbix_dbuser }}"
+       zabbix_server_dbpassword: "{{ zabbix_password }}"
+
+     - role: community.zabbix.zabbix_web
+       zabbix_timezone: Europe/Rome
+       zabbix_api_server_url: 127.0.0.1
+       zabbix_server_hostname: 127.0.0.1
+       zabbix_server_name: 127.0.0.1  
+       zabbix_server_dbtype: postgresql
+       zabbix_server_dbhost: localhost
+
+       zabbix_server_dbname: "{{ zabbix_dbname }}"
+       zabbix_server_dbuser: "{{ zabbix_dbuser }}"
+       zabbix_server_dbpassword: "{{ zabbix_password }}"
+
+

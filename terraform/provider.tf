@@ -3,7 +3,7 @@ terraform {
 
   backend "gcs" {
     bucket      = "terraform-bucket-come2code"
-    credentials = ".secrets/scenic-edition-435709-h2-62abecc99325.json"
+    credentials = ".secrets/scenic-edition-435709-h2-8be0009bf845.json"
   }
 
 

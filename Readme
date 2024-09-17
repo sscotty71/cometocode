@@ -71,6 +71,8 @@ ansible-core is already the newest version (2.16.3-0ubuntu2).
 
 stefano@prova-stefano:~$ git clone git@github.com:sscotty71/cometocode.git
 
+git checkout klonet
+
 - Configurare VAULT
 
 cat /etc/vault.d/vault.hcl 
@@ -120,15 +122,17 @@ In linea di principio queste chiavi andrebbero distribuite su più persone per e
 
 
 
-Unseal Key 1: druYtd/9Li3CY1WVPGdX6BajmIVkuj1AGxed7OzPmHAr
-Unseal Key 2: 5Fevg97wxdmo8S9u9diHcb9CWyvWSxglTks6QH/HyAOh
-Unseal Key 3: yFjGl4KLbNnEZjFuUcYnXXhIaNb6xgjXeFjg96ifkvVy
-Unseal Key 4: +yTgOlLQeZjKMtefbH24aspP5SYe1i5PHSIC32oLK38S
-Unseal Key 5: +azoPGWNPIdDHKR2CWG+eHcREyFt6O+QR5c9qFXqnTVO
+Unseal Key 1: pgykcVjozycMuZom8aVbICmPa5dsbLXbCVWDmm3vnGnV
+Unseal Key 2: 3HgC3V7pHIlExWbuqbzGcciwZVXE/WZmVJuPxRShwrwb
+Unseal Key 3: uqv/m4bnZn0rO7WmorpAu8OoUmxkXjeRQ1Gp+qgNDfxc
+Unseal Key 4: laurkChXE/Mp7JwF33AUYzJLwjWCmLLsDM2sW/riLOWC
+Unseal Key 5: NlS8T2Tm4Pr8SZwKGhKYC4Vbt1PwBsh/0CTQJY1ImRyP
+
+
 
 Inoltre creare il token di root, che non ha nessuna limitazione
 
-Initial Root Token: hvs.l5Tn5OJPeDKlCVnOxOfv4dUV
+Initial Root Token: hvs.RxvvGuNO0b02dR772TVwO6Vb
 
 
 Usiamo 3 delle 5 chiavi per sbloccare il vault
@@ -142,7 +146,7 @@ vault operator unseal
 
 
 # LOGIN 
-vault login hvs.l5Tn5OJPeDKlCVnOxOfv4dUV
+vault login hvs.RxvvGuNO0b02dR772TVwO6Vb
 
 
 # Creo e carico la policy per leggere i secrets con path cometocode-secrets/*
@@ -151,13 +155,11 @@ vim read-only-cometocode-secrets.hcl
 path "cometocode-secrets/*" {
 capabilities = ["read", "list"]
 }
-vault policy write read-only-cometocode-secrets read-only-cometocode-secrets.hcl
+vault policy write read-only-cometocode-secrets vault/read-only-cometocode-secrets.hcl
 
 vim token-policy.hcl
-path "auth/token/create" {
-  capabilities = ["create", "update"]
-}
-vault policy write token-policy  token-policy.hcl
+
+vault policy write token-policy  vault/token-policy.hcl
 
 #Creo il secrets per kv2 con path  cometocode-secrets
 vault secrets enable -path=cometocode-secrets -version=2 kv
@@ -216,7 +218,7 @@ type                service
 
 ### 
 
-Creare la directory: mkdir .secrets
+Creare la directory:  
 Mettere una la chiave gcp per accedere a bucket.
 
 Se non viene fatta questa operazione: │ Error: the string provided in credentials is neither valid json nor a valid file path
@@ -270,8 +272,8 @@ git clone https://github.com/geerlingguy/ansible-role-php.git
 git clone https://github.com/geerlingguy/ansible-role-apache.git
 
 
+ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=hvs.CAESIOpu5HcMHOJoWruvKRUHghxZJN6DfDk_xzvurP7MSX0zGh4KHGh2cy5wcWxWSU12cHVsR1hiUVN3YUloWUhGU04"
 
-ansible-playbook -i inventory.yml ansible/zabbix-agent.yml -u stefano -b --extra-vars "vault_token=hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU"
-ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU"
+ansible-playbook -i inventory.yml ansible/zabbix-agent.yml -u stefano -b --extra-vars "vault_token=hvs.CAESIOpu5HcMHOJoWruvKRUHghxZJN6DfDk_xzvurP7MSX0zGh4KHGh2cy5wcWxWSU12cHVsR1hiUVN3YUloWUhGU04"
 
 

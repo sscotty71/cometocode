@@ -78,7 +78,7 @@ all:
     zabbix_server: "{{ hostvars['monitor']['ansible_host'] }}"
     zabbix_serveractive: "{{ hostvars['monitor']['ansible_host'] }}"
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
-    ansible_python_interpreter=/usr/bin/python3.12
+    ansible_python_interpreter: /usr/bin/python3.12
     vault_token: 'hvs.Y5g63HIwkbWGKdQbvmN6gyJb'
     vault_server: 127.0.0.1
     vault_opts:

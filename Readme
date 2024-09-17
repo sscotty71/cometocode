@@ -1,24 +1,277 @@
 ## 
-Ansible hvac problem:
+Ansible hvac problem mac os X:
 
 export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
 
 
-# Playbook
 
-ansible-playbook -i inventory.yml ansible/zabbix-agent.yml -u stefano -b
-ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=1.23.45 vault_server=127.0.0.1"
+
+### SETUP DEL TUTTO
+
+# Deve essere presente un template proxmox, con installato cloud-init e se già presente deve essere fatta questa procedura.
+
+* Installare il sistema operativo da DVD
+
+* Creare un utente in questo caso io l'ho chiamato ubuntu e/o terraform
+
+  Per la gestione del sudo
+
+  # User rules for ubuntu
+  ubuntu ALL=(ALL) NOPASSWD:ALL
+
+  #All'utente ubuntu mettiamo in authorized_keys una chiave pubblica per poter accedere in ssh
+
+
+* Install cloud init
+
+sudo apt update && sudo apt upgrade -y
+sudo apt install cloud-init -y
+
+* Clean up the VM:
+
+sudo rm -rf /etc/ssh/ssh_host_*
+sudo cloud-init clean
+
+/etc/netplan/00-installer-config.yaml
+
+network:
+  version: 2
+  ethernets:
+    ens18:
+      dhcp4: true
+
+
+
+ 
+In ambiente proxmox:
+
+pveum role add TerraformProv -privs "Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit Pool.Allocate Sys.Audit Sys.Console Sys.Modify VM.Allocate VM.Audit VM.Clone VM.Config.CDROM VM.Config.Cloudinit VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.Migrate VM.Monitor VM.PowerMgmt SDN.Use"
+pveum user add terraform-prov@pve --password HpL-7yVJLPZxaU3DgPXW
+pveum aclmod / -user terraform-prov@pve -role TerraformProv
+
+
+
+Su una vm: ubuntu 24.04 lts
+
+
+ANSIBLE
+apt install ansible-core
+
+TERRAFORM and VAULT
+
+wget -O- https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+sudo apt update && sudo apt install terraform vault
+
+
+terraform is already the newest version (1.9.5-1).
+vault is already the newest version (1.17.5-1).
+ansible-core is already the newest version (2.16.3-0ubuntu2).
+
+
+stefano@prova-stefano:~$ git clone git@github.com:sscotty71/cometocode.git
+
+- Configurare VAULT
+
+cat /etc/vault.d/vault.hcl 
+
+Recuperare queste informazioni
+
+  address       = "0.0.0.0:8200"
+  tls_cert_file = "/opt/vault/tls/tls.crt"
+  tls_key_file  = "/opt/vault/tls/tls.key"
+
+verificare che il servizio è up:
+
+systemctl status vault, in caso avviare il servizio e impostarlo enable
+
+# systemctl start vault
+# systemctl enable vault
+
+Come utente non root esportare queste due variabili.
+
+
+export VAULT_ADDR='https://127.0.0.1:8200' 
+export VAULT_SKIP_VERIFY=true
+
+stefano@prova-stefano:~/cometocode$ vault status
+
+ey                Value
+---                -----
+Seal Type          shamir
+Initialized        false
+Sealed             true
+Total Shares       0
+Threshold          0
+Unseal Progress    0/0
+Unseal Nonce       n/a
+Version            1.17.5
+Build Date         2024-08-30T15:54:57Z
+Storage Type       file
+HA Enabled         false
+
+
+Ora bisogna iniziare il vault
+
+vault operator init -key-threshold=3   
+
+Questa operazione, genera 5 chiavi di unseal per dissigillare il vault, impostando un limite minimo di 3 keys. 
+In linea di principio queste chiavi andrebbero distribuite su più persone per evitare che uno abbia il controllo completo.
+
+
+
+Unseal Key 1: druYtd/9Li3CY1WVPGdX6BajmIVkuj1AGxed7OzPmHAr
+Unseal Key 2: 5Fevg97wxdmo8S9u9diHcb9CWyvWSxglTks6QH/HyAOh
+Unseal Key 3: yFjGl4KLbNnEZjFuUcYnXXhIaNb6xgjXeFjg96ifkvVy
+Unseal Key 4: +yTgOlLQeZjKMtefbH24aspP5SYe1i5PHSIC32oLK38S
+Unseal Key 5: +azoPGWNPIdDHKR2CWG+eHcREyFt6O+QR5c9qFXqnTVO
+
+Inoltre creare il token di root, che non ha nessuna limitazione
+
+Initial Root Token: hvs.l5Tn5OJPeDKlCVnOxOfv4dUV
+
+
+Usiamo 3 delle 5 chiavi per sbloccare il vault
+
+# UNSEAL OPERATION
+vault operator unseal
+
+vault operator unseal
+
+vault operator unseal
+
+
+# LOGIN 
+vault login hvs.l5Tn5OJPeDKlCVnOxOfv4dUV
+
+
+# Creo e carico la policy per leggere i secrets con path cometocode-secrets/*
+vim read-only-cometocode-secrets.hcl
+
+path "cometocode-secrets/*" {
+capabilities = ["read", "list"]
+}
+vault policy write read-only-cometocode-secrets read-only-cometocode-secrets.hcl
+
+vim token-policy.hcl
+path "auth/token/create" {
+  capabilities = ["create", "update"]
+}
+vault policy write token-policy  token-policy.hcl
+
+#Creo il secrets per kv2 con path  cometocode-secrets
+vault secrets enable -path=cometocode-secrets -version=2 kv
+
+# Inserisco i secrets necessari per terraform e ansible
+vault kv put cometocode-secrets/proxmox pm_api_url="https://192.168.173.91:8006/api2/json" pm_user="terraform-prov@pve" pm_password="HpL-7yVJLPZxaU3DgPXW"
+vault kv put cometocode-secrets/zabbix_server dbname="zabbix" dbuser="zabbix" dbpassword="v36dhUSV-RGUuCbFGkM"
+vault kv put cometocode-secrets/zabbix_agent_pg_user username="zbx_monitor" password="c3bkne,bZjrcBGwrHQN"
+
+# Creo un token per con un ttl di 1h per lavorare con il tutto
+vault token create -policy="read-only-cometocode-secrets" -policy="token-policy"  -ttl=1h  -explicit-max-ttl=48h
+
+Key                  Value
+---                  -----
+token                hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU
+token_accessor       Fappyoo1mWREsXycfLGdrdI6
+token_duration       1h
+token_renewable      true
+token_policies       ["default" "read-only-cometocode-secrets" "token-policy"]
+identity_policies    []
+policies             ["default" "read-only-cometocode-secrets" "token-policy"]
+
+# Facciamo la login con il nuovo token
+
+vault login ...
+
+E proviamo a recuperare una dei segreti registrati in vault.
 
 vault kv get cometocode-secrets/proxmox
- pm_api_url 
- pm_user 
- pm_password
- 
-vault kv get cometocode-secrets/zabbix_server
- dbname 
- dbuser 
- dbpassword 
 
-vault kv get cometocode-secrets/zabbix_agent_pg_user
- username 
- password
+Per essere sicuri che stiamo utilizzando il token giusto, possiamo lanciare il comando:  vault token lookup
+
+tefano@prova-stefano:~/cometocode/vault$ vault token lookup
+stefano@prova-stefano:~/cometocode/vault$  vault token lookup
+Key                 Value
+---                 -----
+accessor            Fappyoo1mWREsXycfLGdrdI6
+creation_time       1726556995
+creation_ttl        1h
+display_name        token
+entity_id           n/a
+expire_time         2024-09-17T08:09:55.615640994Z
+explicit_max_ttl    48h
+id                  hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU
+issue_time          2024-09-17T07:09:55.615645185Z
+meta                <nil>
+num_uses            0
+orphan              false
+path                auth/token/create
+policies            [default read-only-cometocode-secrets token-policy]
+renewable           true
+ttl                 59m8s
+type                service
+
+
+
+### 
+
+Creare la directory: mkdir .secrets
+Mettere una la chiave gcp per accedere a bucket.
+
+Se non viene fatta questa operazione: │ Error: the string provided in credentials is neither valid json nor a valid file path
+
+
+
+terraform init
+
+- Reusing previous version of telmate/proxmox from the dependency lock file
+- Reusing previous version of hashicorp/vault from the dependency lock file
+- Reusing previous version of hashicorp/local from the dependency lock file
+- Reusing previous version of hashicorp/null from the dependency lock file
+- Installing telmate/proxmox v3.0.1-rc4...
+- Installed telmate/proxmox v3.0.1-rc4 (self-signed, key ID A9EBBE091B35AFCE)
+- Installing hashicorp/vault v4.4.0...
+- Installed hashicorp/vault v4.4.0 (signed by HashiCorp)
+- Installing hashicorp/local v2.5.2...
+- Installed hashicorp/local v2.5.2 (signed by HashiCorp)
+- Installing hashicorp/null v3.2.3...
+- Installed hashicorp/null v3.2.3 (signed by HashiCorp)
+Partner and community providers are signed by their developers.
+
+Terraform plan.... mancava la chiave per l'utente ubuntu privata: automation_ed25519 e inoltre bisogna specificare correttamente il token
+
+Deve essere caricato sull'utente che lancia TERRAFORM la chiave privata.
+
+
+terraform plan -var="VAULT_TOKEN=hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU"
+terraform apply -var="VAULT_TOKEN=hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU"
+
+Una volta create le vm, andiamo nella sezione ansible,
+
+ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU"
+
+ 
+fatal: [monitor]: FAILED! => {"msg": "An unhandled exception occurred while running the lookup plugin 'community.hashi_vault.vault_kv2_get'. Error was a <class 'ansible.errors.AnsibleError'>, original message: This plugin requires the 'hvac' Python library. This plugin requires the 'hvac' Python library"}
+
+apt install python3-pip ?? Da vedere
+
+ apt install python3-hvac
+
+ ansible-galaxy collection list | grep zabbix
+community.zabbix                         2.3.1  
+
+ansible-galaxy collection install community.zabbix --force
+community.zabbix                         3.1.2  
+
+## Role per la gestione di postsgresql, apache e php
+git clone https://github.com/geerlingguy/ansible-role-postgresql.git
+git clone https://github.com/geerlingguy/ansible-role-php.git
+git clone https://github.com/geerlingguy/ansible-role-apache.git
+
+
+
+ansible-playbook -i inventory.yml ansible/zabbix-agent.yml -u stefano -b --extra-vars "vault_token=hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU"
+ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU"
+
+

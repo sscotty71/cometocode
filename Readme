@@ -1,18 +1,12 @@
-## 
-Ansible hvac problem mac os X:
+Alcuni appunti
 
-export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
-
-
-
-
-### SETUP DEL TUTTO
+### SETUP DI UN TEMPLATE
 
 # Deve essere presente un template proxmox, con installato cloud-init e se già presente deve essere fatta questa procedura.
 
 * Installare il sistema operativo da DVD
 
-* Creare un utente in questo caso io l'ho chiamato ubuntu e/o terraform
+* Creare un utente in questo caso io l'ho chiamato ubuntu 
 
   Per la gestione del sudo
 
@@ -32,23 +26,47 @@ sudo apt install cloud-init -y
 sudo rm -rf /etc/ssh/ssh_host_*
 sudo cloud-init clean
 
+
+# Questo solo su ubuntu
 /etc/netplan/00-installer-config.yaml
 
 network:
   version: 2
-  ethernets:
-    ens18:
-      dhcp4: true
+  ethernets:\
 
 
+#
+
+dA provare:
+
+
+provider "proxmox" {
+  # Configura il provider Proxmox
+}
 
  
-In ambiente proxmox:
+  # Cloud-Init user_data script
+ # user_data = <<-EOF
+ #   #cloud-config
+ #   users:
+  #    - name: admin
+   #     sudo: ALL=(ALL) NOPASSWD:ALL
+    #    groups: sudo
+     #   home: /home/admin
+    #    shell: /bin/bash
+    #    ssh-authorized-keys:
+   #       - ssh-rsa AAAAB3NzaC...your-public-key... admin@your-laptop
+   # packages:
+   #   - nginx
+    #runcmd:
+    #  - systemctl start nginx
+    #  - systemctl enable nginx
+  #EO#F
 
-pveum role add TerraformProv -privs "Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit Pool.Allocate Sys.Audit Sys.Console Sys.Modify VM.Allocate VM.Audit VM.Clone VM.Config.CDROM VM.Config.Cloudinit VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.Migrate VM.Monitor VM.PowerMgmt SDN.Use"
-pveum user add terraform-prov@pve --password HpL-7yVJLPZxaU3DgPXW
-pveum aclmod / -user terraform-prov@pve -role TerraformProv
-
+  # Altre configurazioni Proxmox VM
+ 
+  #EOF
+# CONSOLE
 
 
 Su una vm: ubuntu 24.04 lts
@@ -67,11 +85,6 @@ sudo apt update && sudo apt install terraform vault
 terraform is already the newest version (1.9.5-1).
 vault is already the newest version (1.17.5-1).
 ansible-core is already the newest version (2.16.3-0ubuntu2).
-
-
-stefano@prova-stefano:~$ git clone git@github.com:sscotty71/cometocode.git
-
-git checkout klonet
 
 - Configurare VAULT
 
@@ -121,7 +134,6 @@ Questa operazione, genera 5 chiavi di unseal per dissigillare il vault, impostan
 In linea di principio queste chiavi andrebbero distribuite su più persone per evitare che uno abbia il controllo completo.
 
 
-
 Unseal Key 1: pgykcVjozycMuZom8aVbICmPa5dsbLXbCVWDmm3vnGnV
 Unseal Key 2: 3HgC3V7pHIlExWbuqbzGcciwZVXE/WZmVJuPxRShwrwb
 Unseal Key 3: uqv/m4bnZn0rO7WmorpAu8OoUmxkXjeRQ1Gp+qgNDfxc
@@ -144,22 +156,16 @@ vault operator unseal
 
 vault operator unseal
 
+# SEAL OPERATION
+vault operator seal
+
 
 # LOGIN 
 vault login hvs.RxvvGuNO0b02dR772TVwO6Vb
 
 
 # Creo e carico la policy per leggere i secrets con path cometocode-secrets/*
-vim read-only-cometocode-secrets.hcl
 
-path "cometocode-secrets/*" {
-capabilities = ["read", "list"]
-}
-vault policy write read-only-cometocode-secrets vault/read-only-cometocode-secrets.hcl
-
-vim token-policy.hcl
-
-vault policy write token-policy  vault/token-policy.hcl
 
 #Creo il secrets per kv2 con path  cometocode-secrets
 vault secrets enable -path=cometocode-secrets -version=2 kv
@@ -170,7 +176,8 @@ vault kv put cometocode-secrets/zabbix_server dbname="zabbix" dbuser="zabbix" db
 vault kv put cometocode-secrets/zabbix_agent_pg_user username="zbx_monitor" password="c3bkne,bZjrcBGwrHQN"
 
 # Creo un token per con un ttl di 1h per lavorare con il tutto
-vault token create -policy="read-only-cometocode-secrets" -policy="token-policy"  -ttl=1h  -explicit-max-ttl=48h
+vault token create -policy="read-only-cometocode-secrets" -policy="token-policy" -policy="token-kv2-mgmt-policy"   -ttl=1h  -explicit-max-ttl=48h
+vault token create -policy="read-only-cometocode-secrets" -policy="token-policy"     -ttl=1h  -explicit-max-ttl=48h
 
 Key                  Value
 ---                  -----
@@ -216,9 +223,119 @@ type                service
 
 
 
+
+token-policy.hcl
+
+path "auth/token/create" {
+  capabilities = ["create", "update"]
+}
+
+
+
+read-only-cometocode-secrets.hcl
+
+path "cometocode-secrets/*" {
+capabilities = ["read", "list"]
+}
+
+token-kv2-mgmt-policy.hcl 
+
+# Policy per generare token
+path "auth/token/create" {
+  capabilities = ["read", "list", "create", "update"]
+}
+
+path "sys/mounts" {
+  capabilities = ["read", "list"]
+}
+
+path "cometocode-secrets/*" {
+  capabilities = ["read", "list", "create", "update", "delete"]
+}
+
+# Permessi per leggere policy e vederne i dettagli
+path "sys/policies/acl/*" {
+  capabilities = ["read", "list"]
+}
+
+# Permessi per creare secrets solo nel motore KV2
+path "secret/data/*" {
+  capabilities = ["create", "update"]
+}
+
+path "sys/auth" {
+  capabilities = ["read", "list","create", "update"]
+}
+
+# Permessi per leggere i dettagli di uno specifico metodo di autenticazione
+path "sys/auth/*" {
+  capabilities = ["read"]
+}
+
+
+vault policy write token-kv2-mgmt-policy vault/token-kv2-mgmt-policy.hcl 
+vault policy write read-only-cometocode-secrets vault/read-only-cometocode-secrets.hcl
+vault policy write token-policy  vault/token-policy.hcl
+
+
+
+
+#utenza personale
+vault token create -policy="read-only-cometocode-secrets" -policy="token-policy" -policy="token-kv2-mgmt-policy"  -ttl=0 -explicit-max-ttl=0
+
+Faccio la login con utenza personale, e con quella creo: 
+
+#utenza per lavorare con terraform.. .:D
+
+vault token create -policy="read-only-cometocode-secrets" -policy="token-policy"     -ttl=1h  -explicit-max-ttl=48h
+
+
+
+
+
+
+
+
+
+
+
+## 
+Ansible hvac problem mac os X:
+
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES
+
+
+
+
+
+
+ 
+In ambiente proxmox:
+
+pveum role add TerraformProv -privs "Datastore.AllocateSpace Datastore.AllocateTemplate Datastore.Audit Pool.Allocate Sys.Audit Sys.Console Sys.Modify VM.Allocate VM.Audit VM.Clone VM.Config.CDROM VM.Config.Cloudinit VM.Config.CPU VM.Config.Disk VM.Config.HWType VM.Config.Memory VM.Config.Network VM.Config.Options VM.Migrate VM.Monitor VM.PowerMgmt SDN.Use"
+pveum user add terraform-prov@pve --password HpL-7yVJLPZxaU3DgPXW
+pveum aclmod / -user terraform-prov@pve -role TerraformProv
+
+
+
+
+
+
+stefano@prova-stefano:~$ git clone git@github.com:sscotty71/cometocode.git
+
+git checkout klonet
+
+
+
 ### 
+VAi dentro terraform
+
 
 Creare la directory:  
+
+mkdir .secrets
+
+
 Mettere una la chiave gcp per accedere a bucket.
 
 Se non viene fatta questa operazione: │ Error: the string provided in credentials is neither valid json nor a valid file path
@@ -245,8 +362,8 @@ Terraform plan.... mancava la chiave per l'utente ubuntu privata: automation_ed2
 
 Deve essere caricato sull'utente che lancia TERRAFORM la chiave privata.
 
-
-terraform plan -var="VAULT_TOKEN=hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU"
+hvs.CAESIMruk3BCrtScdlivaGp-iL832bbwWgo4jlp9B6QH0cfzGh4KHGh2cy5VMlB4Y24zU0t2N292eFRuQ2NhaGlSejk
+terraform plan -var="VAULT_TOKEN=hvs.CAESIKT0k6zj-ItYj5oJhqS6o-8GGnzuqJx6YIm5I6yZPe3NGh4KHGh2cy5SRThkUjlieWNPNDRRYWpJWEVLVkZ5ZTA"
 terraform apply -var="VAULT_TOKEN=hvs.CAESIJrP_JtR65oggc0XhIfDuh3N-uwuQwseJZCQYLhwiA1eGh4KHGh2cy5IbmJXeWljb2QyME02Y0J1cjk3ckQ1dzU"
 
 Una volta create le vm, andiamo nella sezione ansible,
@@ -272,8 +389,12 @@ git clone https://github.com/geerlingguy/ansible-role-php.git
 git clone https://github.com/geerlingguy/ansible-role-apache.git
 
 
-ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=hvs.CAESIOpu5HcMHOJoWruvKRUHghxZJN6DfDk_xzvurP7MSX0zGh4KHGh2cy5wcWxWSU12cHVsR1hiUVN3YUloWUhGU04"
+ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=hvs.BIGjYI1nuj033fFZzgQZU59j"
 
 ansible-playbook -i inventory.yml ansible/zabbix-agent.yml -u stefano -b --extra-vars "vault_token=hvs.CAESIOpu5HcMHOJoWruvKRUHghxZJN6DfDk_xzvurP7MSX0zGh4KHGh2cy5wcWxWSU12cHVsR1hiUVN3YUloWUhGU04"
 
 
+hvs.BIGjYI1nuj033fFZzgQZU59j
+
+
+token                hvs.CAESIKT0k6zj-ItYj5oJhqS6o-8GGnzuqJx6YIm5I6yZPe3NGh4KHGh2cy5SRThkUjlieWNPNDRRYWpJWEVLVkZ5ZTA

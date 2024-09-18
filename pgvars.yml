@@ -8,21 +8,21 @@ pg_conf_directory: /etc/postgresql/{{ pg_version }}/main/conf.d
 pg_postgresql_conf_dir: /etc/postgresql/{{ pg_version }}/main
 pg_password: pgdev
 pg_user: postgres
-pg_host_primary: 192.168.11.91
+pg_host_primary: 192.168.173.25
 pg_wal_level: replica
 pgbackrest_version: 2.53-1.pgdg24.04+1
-pg_backrest_host: 192.168.11.92
+pg_backrest_host: 192.168.173.27
 path_pgbackrest_file_conf: /etc/pgbackrest.conf
 pg_backrest_user: '{{ pg_user }}'
-repo_host: https://192.168.11.95
+repo_host: https://192.168.173.28
 repo1_type: s3
 repo1_path: /repo
 repo1_s3_endpoint: '{{ repo_host }}'
 repo1_s3_uri_style: path
-repo1_s3_bucket: pgbucket
+repo1_s3_bucket: cometocode
 repo1_s3_verify_ssl: "n"
-repo1_s3_key: r26rAp5x8wff7V7S9O7J
-repo1_s3_key_secret: GqkWhJ9kDs8xtsL4DokVkkN359odPrBGPyyjfCZl
+repo1_s3_key: k355NfEO6fWxOJGLvCRH
+repo1_s3_key_secret: eINnWGnzGKWBUz4dEfijIrR91NvuZJiPKruBS1Uq
 repo1_s3_region: myregion
 repo1_storage_host: '{{ repo_host }}'
 repo1_storage_port: "9000"
@@ -43,11 +43,11 @@ stanzas:
     - pg-primary
 pghosts:
     - '{{ pg_host_primary }}'
-pg_host_secondary: 192.168.11.93
+pg_host_secondary: 192.168.173.26
 pg_physical_replica_role: replicarole
 pg_master_replication_slot: master
 #-------- GRAFANA -------------
-grafana_host: "192.168.11.94"
+grafana_host: "192.168.173.29"
 grafana_host_name: "grafana"
 pg_primary_hostname: "pg-primary"
 pg_secondary_hostname: "pg-secondary"

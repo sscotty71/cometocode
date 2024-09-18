@@ -9,6 +9,16 @@
     tags:
       - pitr
 
+  - name: Install Packages
+    become: yes
+    become_user: root
+    apt:
+      pkg:
+       - cron
+      state: present
+      update_cache: yes
+    tags:
+      - postgresql
 #Check user
   - name: Check {{ pg_user }} user account
     become: yes

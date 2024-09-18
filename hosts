@@ -1,23 +1,23 @@
 [allpgandpitr]
-192.168.11.91 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
-192.168.11.92 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
-192.168.11.93 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.25 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.26 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.27 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12
 
 [allpg]
-192.168.11.91 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
-192.168.11.93 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.25 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.26 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12
 
 [pgprimary]
-192.168.11.91 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.25 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12
 
 [pgsecondary]
-192.168.11.93 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.26 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12
 
 [pgbackrest]
-192.168.11.92 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.27 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12
 
 [BucketServer]
-192.168.11.95 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.28 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12
 
 [grafana]
-192.168.11.94 ansible_user=scotty ansible_python_interpreter=/usr/bin/python3.12
+192.168.173.29 ansible_user=stefano ansible_python_interpreter=/usr/bin/python3.12

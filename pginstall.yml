@@ -1,12 +1,12 @@
 #LOCALE it-UTF-8
-  - name: Locale it-UTF-8
-    become: yes
-    become_user: root
-    locale_gen:
-      name: it_IT.UTF-8
-      state: present
-    tags:
-      - postgresql
+#  - name: Locale it-UTF-8
+#    become: yes
+#    become_user: root
+#    locale_gen:
+#     name: it_IT.UTF-8
+#      state: present
+#    tags:
+#      - postgresql
 
  # Packages install
 

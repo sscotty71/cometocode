@@ -99,7 +99,7 @@ host    all             all             ::1/128                 ident
 #Grafana
 host    postgres    postgres            {{ grafana_host_name }}                 trust
 # Physical replication
-host    replication     {{ pg_physical_replica_role }}     {{ pg_secondary_hostname }}   scram-sha-256
+host    replication     {{ pg_physical_replica_role }}     {{ pg_host_secondary }}/32   scram-sha-256
 # Allow replication connections from localhost, by a user with the
 # replication privilege.
 local   replication     all                                     peer

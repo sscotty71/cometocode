@@ -1,7 +1,11 @@
 ---
-  - name: Leggi un secret da Vault KV2
+  - name: Leggi il secret da Vault KV2 per zabbix_server
     set_fact:
-     zabbix_server_secrets: "{{ lookup('community.hashi_vault.vault_kv2_get', 'zabbix_server', **vault_opts) }}"
+     zabbix_server_secrets: "{{ 
+      lookup('community.hashi_vault.vault_kv2_get', 
+      'zabbix_server', 
+      **vault_opts) 
+      }}"
 
   - name: Estrai il username e password e memorizzali in variabili distinte
     set_fact:

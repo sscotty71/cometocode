@@ -21,13 +21,13 @@ terraform {
 
 provider "vault" {
   address = "https://127.0.0.1:8200"
-  token   = var.VAULT_TOKEN  # Token per l'accesso a Vault
+  token   = var.VAULT_TOKEN # Token per l'accesso a Vault
 }
 
 data "vault_kv_secret_v2" "proxmox" {
-   mount    = "cometocode-secrets"
-   name     = "proxmox"
- }
+  mount = "cometocode-secrets"
+  name  = "proxmox"
+}
 
 provider "proxmox" {
   pm_tls_insecure = true

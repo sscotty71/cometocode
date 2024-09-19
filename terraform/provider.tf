@@ -8,26 +8,27 @@ terraform {
 
 
   required_providers {
-    proxmox = {
-      source  = "Telmate/proxmox"
-      version = "3.0.1-rc4"
-    }
+
     vault = {
       source  = "hashicorp/vault"
       version = "4.4.0"
+    }
+      proxmox = {
+      source  = "Telmate/proxmox"
+      version = "3.0.1-rc4"  # Usa una versione stabile se disponibile
     }
   }
 }
 
 provider "vault" {
   address = "https://127.0.0.1:8200"
-  token   = var.VAULT_TOKEN # Token per l'accesso a Vault
+  token   = var.VAULT_TOKEN  # Token per l'accesso a Vault
 }
 
 data "vault_kv_secret_v2" "proxmox" {
-  mount = "cometocode-secrets"
-  name  = "proxmox"
-}
+   mount    = "cometocode-secrets"
+   name     = "proxmox"
+ }
 
 provider "proxmox" {
   pm_tls_insecure = true
@@ -37,7 +38,5 @@ provider "proxmox" {
   pm_user     = data.vault_kv_secret_v2.proxmox.data["pm_user"]
   pm_password = data.vault_kv_secret_v2.proxmox.data["pm_password"]
 
-  # Per future implementazioni:
-  # pm_api_token_id     = data.vault_kv_secret_v2.proxmox_secrets.data["pm_api_token_id"]
-  # pm_api_token_secret = data.vault_kv_secret_v2.proxmox_secrets.data["pm_api_token_secret"]
+ 
 }

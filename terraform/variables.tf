@@ -4,7 +4,7 @@ variable "TARGET_NODE" {
 }
 variable "TARGET_POOL" {
   type = string
-  default ="cometocode"
+  default ="come-to-code"
 }
 variable "VAULT_TOKEN" {
   type = string

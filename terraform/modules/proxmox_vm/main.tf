@@ -23,15 +23,22 @@ resource "proxmox_vm_qemu" "cloudinit" {
 
   pool = var.pool
 
-  vm_state = "started"
+  vm_state = var.vms[count.index]["vm_state"]
   scsihw   = "virtio-scsi-single"
   disks {
+     ide {
+      ide3 {
+        cloudinit {
+          storage = var.vms[count.index]["storage"]
+        }
+      }
+    }
     scsi {
       scsi0 {
         disk {
           size    = var.vms[count.index]["disk_size"]
           cache   = "writeback"
-          storage = "local-lvm"
+          storage = var.vms[count.index]["storage"]
         }
       }
     }

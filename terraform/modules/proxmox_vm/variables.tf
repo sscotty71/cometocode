@@ -13,6 +13,13 @@ variable "pool" {
   type = string
 }
 
+variable "os_type" {
+  type = string
+  default = "cloud-init"
+}
+
+
+
 # variable "local_private_key" {
 #     type = string
 #     sensitive = true

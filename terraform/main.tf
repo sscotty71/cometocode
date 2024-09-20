@@ -1,10 +1,4 @@
 # main.tf
-
-# Autore: Stefano De Nardis
-# Email: stefano.denardis@klonet.it
-# Esempio per cometocode 2024
-
-
 locals {
   vms = yamldecode(file("vm_info.yaml"))["vms"]
 }
@@ -20,6 +14,6 @@ module "proxmox_vms" {
 module "ansible_inventory" {
   source        = "./modules/ansible_inventory"
   filename      = "../inventory.yml"
-  template_file = "../inventory.tpl"
+  template_file = "./modules/ansible_inventory/templates/inventory.tpl"
   vms           = local.vms
 }

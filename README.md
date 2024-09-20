@@ -242,7 +242,12 @@ git clone https://github.com/geerlingguy/ansible-role-apache.git
 Infine lanciamo ansible 
 
 ```
-cometocode$ ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=hvs.ESIKT0k6zo..."
-cometocode$ ansible-playbook -i inventory.yml ansible/zabbix-agent.yml -u stefano -b --extra-vars "vault_token=hvs.ESIKT0k6zo..."
+ansible-playbook -i inventory.yml ansible/zabbix-server-pg.yml -u stefano -b --extra-vars "vault_token=hvs.ESIKT0k6zo..."
+ansible-playbook -i inventory.yml ansible/zabbix-agent.yml -u stefano -b --extra-vars "vault_token=hvs.ESIKT0k6zo..."
 
 ```
+
+
+Per chi ha il mac os:
+
+export OBJC_DISABLE_INITIALIZE_FORK_SAFETY=YES

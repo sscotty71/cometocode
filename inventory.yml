@@ -1,5 +1,13 @@
 all:
  hosts:
+   pgprimary: 
+      ansible_host: 192.168.173.25
+   pgsecondary: 
+      ansible_host: 192.168.173.26
+   pgbackrest: 
+      ansible_host: 192.168.173.27
+   bucketserver: 
+      ansible_host: 192.168.173.28
    monitor: 
       ansible_host: 192.168.173.29
 
@@ -77,7 +85,7 @@ all:
     zabbix_serveractive: "{{ hostvars['monitor']['ansible_host'] }}"
     ansible_ssh_common_args: '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null'
     ansible_python_interpreter: /usr/bin/python3.12
-    vault_token: 'xxxxxxxx'
+    vault_token: 'hvs.Y5g63HIwkbWGKdQbvmN6gyJb'
     vault_server: 127.0.0.1
     vault_opts:
      url: "https://{{vault_server}}:8200"

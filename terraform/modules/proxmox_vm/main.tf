@@ -1,5 +1,9 @@
 # modules/proxmox_vm/main.tf
 
+# Autore: Stefano De Nardis
+# Email: stefano.denardis@klonet.it
+# Esempio per cometocode 2024
+
 
 resource "proxmox_vm_qemu" "cloudinit" {
   count = var.vm_count

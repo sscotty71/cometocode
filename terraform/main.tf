@@ -1,4 +1,10 @@
 # main.tf
+
+# Autore: Stefano De Nardis
+# Email: stefano.denardis@klonet.it
+# Esempio per cometocode 2024
+
+
 locals {
   vms = yamldecode(file("vm_info.yaml"))["vms"]
 }

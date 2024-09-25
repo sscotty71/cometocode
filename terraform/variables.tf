@@ -8,6 +8,6 @@ variable "TARGET_POOL" {
 }
 variable "VAULT_TOKEN" {
   type = string
-  default ="token"
+  
   sensitive = true
 }

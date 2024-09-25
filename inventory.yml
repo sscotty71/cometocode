@@ -1,15 +1,7 @@
 all:
  hosts:
-   pgprimary: 
+   test-klone: 
       ansible_host: 192.168.173.25
-   pgsecondary: 
-      ansible_host: 192.168.173.26
-   pgbackrest: 
-      ansible_host: 192.168.173.27
-   bucketserver: 
-      ansible_host: 192.168.173.28
-   monitor: 
-      ansible_host: 192.168.173.29
 
  children:
   pg_servers:

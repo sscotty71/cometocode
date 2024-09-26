@@ -1,0 +1,20 @@
+#cloud-config
+
+#https://cloudinit.readthedocs.io/en/latest/
+
+users:
+  - name: stefano
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    ssh_authorized_keys: |
+      ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA20F2OR+1k3G9uqAPVK6jocAmRVwP0ZjeyEpTaqOSBBkzu/hl8HtenWy4DlZ9HZlgTMnzgzkKRuTvLvjRzdWJWFDrcJOYD8Af/9DZiy3eu8wc5For6q0i4JD600PqI2hBC0Kp2f8rTRAW/dsbtM7I90BjZhDDUHpbup/OwvKnEj/edyXUcsV3B64IXXqF//XQYmyKajf8Sc3Zhq8ttEUqSGjDfB9wO+uhtHdEuaFCh4mw3F+dLaBWL6nFP5vW6+UIuQ2AGJ/01xRKv7LRidAms339dbaDvnbID8SY87zaAZzIeNreO2G9aJqSJNZeveRjX/7gA/WuBw2FM4WCraKj stefano.denardis@MacBook-Air-di-Stefano.local
+
+  - name: enrico
+    shell: /bin/bash
+    sudo: ALL=(ALL) NOPASSWD:ALL
+    groups: sudo
+    ssh_authorized_keys: |
+       ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDA20F2OR+1k3G9uqAPVK6jocAmRVwP0ZjeyEpTaqOSBBkzu/hl8HtenWy4DlZ9HZlgTMnzgzkKRuTvLvjRzdWJWFDrcJOYD8Af/9DZiy3eu8wc5For6q0i4JD600PqI2hBC0Kp2f8rTRAW/dsbtM7I90BjZhDDUHpbup/OwvKnEj/edyXUcsV3B64IXXqF//XQYmyKajf8Sc3Zhq8ttEUqSGjDfB9wO+uhtHdEuaFCh4mw3F+dLaBWL6nFP5vW6+UIuQ2AGJ/01xRKv7LRidAms339dbaDvnbID8SY87zaAZzIeNreO2G9aJqSJNZeveRjX/7gA/WuBw2FM4WCraKj stefano.denardis@MacBook-Air-di-Stefano.local
+
+  

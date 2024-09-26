@@ -29,6 +29,11 @@ data "vault_kv_secret_v2" "proxmox" {
    mount    = "cometocode-secrets"
    name     = "proxmox"
  }
+ 
+data "vault_kv_secret_v2" "proxmox-ssh" {
+   mount    = "cometocode-secrets"
+   name     = "proxmox-ssh"
+ }
 
 provider "proxmox" {
   pm_tls_insecure = true

@@ -1,5 +1,50 @@
 # modules/proxmox_vm/main.tf
 
+resource "proxmox_cloud_init_disk" "ci" {
+   name           = "example-CI-disk"
+   pve_node       = var.target_node
+   storage        = "local"
+   meta_data = yamlencode({
+     instance_id    = sha1("example")
+     local-hostname = "example"
+   })
+  # vendor_data    = file("cloud-init/vendor.yml")
+   user_data      = file("${path.module}/user_info.yaml")
+
+   network_config = yamlencode({
+    version = 1
+    config = [{
+      type = "physical"
+      name = "eth0"
+      subnets = [{
+        type            = "static"
+        address         = "192.168.1.100/24"
+        gateway         = "192.168.1.1"
+        dns_nameservers = ["1.1.1.1", "8.8.8.8"]
+      }]
+    }]
+  })
+ }
+
+
+# Transfer the file to the Proxmox Host
+resource "null_resource" "cloud_init_snippets" {
+ 
+
+  connection {
+    type        = "ssh"
+    user        = var.ssh_pve_username
+    password    = var.ssh_pve_passwd
+    host        = var.ssh_pve_host
+  }
+
+  provisioner "file" {
+    source      = "${path.module}/user_info.yaml"
+    destination = "/var/lib/vz/snippets/users.yml"
+  }
+}
+
+
 resource "proxmox_vm_qemu" "cloudinit" {
   count = var.vm_count
 
@@ -47,9 +92,7 @@ resource "proxmox_vm_qemu" "cloudinit" {
   boot       = "order=scsi0;net0"
   nameserver = var.vms[count.index]["nameserver"]
   ipconfig0  = var.vms[count.index]["ipconfig0"]
-
-  ciuser  = var.vms[count.index]["user"]
-  sshkeys = var.vms[count.index]["sshkeys"]
+  cicustom  = "user=local:snippets/users.yml"
 
   connection {
     type        = "ssh"

@@ -12,12 +12,17 @@ module "proxmox_pool" {
 }
 
 module "proxmox_vms" {
-  source      = "./modules/proxmox_vm"
-  pool        = var.TARGET_POOL
-  vm_count    = length(local.vms)
-  vms         = local.vms
-  target_node = var.TARGET_NODE
-  depends_on = [module.proxmox_pool]
+  source           = "./modules/proxmox_vm"
+
+  ssh_pve_username = data.vault_kv_secret_v2.proxmox-ssh.data["username"]
+  ssh_pve_passwd   = data.vault_kv_secret_v2.proxmox-ssh.data["password"]
+  ssh_pve_host     = data.vault_kv_secret_v2.proxmox-ssh.data["host"]
+
+  pool             = var.TARGET_POOL
+  vm_count         = length(local.vms)
+  vms              = local.vms
+  target_node      = var.TARGET_NODE
+  depends_on       = [module.proxmox_pool]
 }
 
 module "ansible_inventory" {

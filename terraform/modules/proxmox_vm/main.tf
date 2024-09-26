@@ -88,6 +88,11 @@ resource "proxmox_vm_qemu" "cloudinit" {
     model  = "virtio"
     bridge = "vmbr0"
   }
+  lifecycle {
+    ignore_changes = [
+      network,
+    ]
+  }
 
   boot       = "order=scsi0;net0"
   nameserver = var.vms[count.index]["nameserver"]

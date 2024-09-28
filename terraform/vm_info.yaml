@@ -1,0 +1,57 @@
+vms:
+    - name: pgprimary
+      vmid: 1001
+      cpu: 1
+      memory: 1024
+      image: "ubuntu-noble"
+      storage: "local-lvm"
+      vm_state: "started"
+      disk_size: 25
+      nameserver: "8.8.8.8"
+      ipconfig0:  "ip=192.168.173.25/24,gw=192.168.173.254"
+     
+
+    - name: pgsecondary
+      vmid: 1002
+      cpu: 1
+      memory: 1024
+      image: "ubuntu-noble"
+      storage: "local-lvm"
+      vm_state: "started"
+      disk_size: 25
+      nameserver: "8.8.8.8"
+      ipconfig0: "ip=192.168.173.26/24,gw=192.168.173.254"
+
+    - name: pgbackrest
+      vmid: 1003
+      cpu: 1
+      memory: 1024
+      image: "ubuntu-noble"
+      storage: "local-lvm"
+      vm_state: "started"
+      disk_size: 25
+      nameserver: "8.8.8.8"
+      ipconfig0:  "ip=192.168.173.27/24,gw=192.168.173.254"
+     
+    - name: bucketserver
+      vmid: 1004
+      cpu: 1
+      memory: 1024
+      image: "ubuntu-noble"
+      storage: "local-lvm"
+      vm_state: "started"
+      disk_size: 25
+      nameserver: "8.8.8.8"
+      ipconfig0:  "ip=192.168.173.28/24,gw=192.168.173.254"
+     
+    - name: monitor
+      vmid: 1005
+      cpu: 1
+      memory: 1024
+      image: "ubuntu-noble"
+      storage: "local-lvm"
+      vm_state: "started"
+      disk_size: 25
+      nameserver: "8.8.8.8"
+      ipconfig0:  "ip=192.168.173.29/24,gw=192.168.173.254"
+     

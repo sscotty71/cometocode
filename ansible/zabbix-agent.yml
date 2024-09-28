@@ -1,0 +1,18 @@
+- name: Install Zabbix Agent 2 on all VMs
+  hosts: all
+  become: false  # Per eseguire i comandi con privilegi di root
+  vars:
+    
+ 
+  roles:
+     - role: community.zabbix.zabbix_agent
+ 
+       zabbix_api_server_port: 80
+       zabbix_api_server_host: "{{ hostvars['monitor']['ansible_host'] }}"
+       zabbix_api_login_user: Admin
+       zabbix_api_login_pass: zabbix
+       zabbix_api_server_url: "http://{{ hostvars['monitor']['ansible_host'] }}"
+       zabbix_api_create_hostgroup: true
+       zabbix_api_create_hosts: true
+       zabbix_agent2: true
+       zabbix_agent_host_state: present

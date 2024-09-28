@@ -1,0 +1,29 @@
+---
+  - name: Retrieve secret from KV2 Vault for zabbix_server
+    set_fact:
+     zabbix_server_secrets: "{{ 
+      lookup('community.hashi_vault.vault_kv2_get', 
+      'zabbix_server', 
+      **vault_opts) 
+      }}"
+
+  - name: Extract the username and password and store them in separate variables
+    set_fact:
+     zabbix_dbname: "{{ zabbix_server_secrets.data.data.dbname }}"
+     zabbix_dbuser: "{{ zabbix_server_secrets.data.data.dbuser }}"
+     zabbix_password: "{{ zabbix_server_secrets.data.data.dbpassword }}"
+  
+  - name: Recover secret from KV 2 Vault for zabbix to recover data for zabbix agent connecting to pg
+    set_fact:
+     zabbix_agent_pg_user: "{{ lookup('community.hashi_vault.vault_kv2_get', 'zabbix_agent_pg_user',  **vault_opts) }}"
+
+  - name: Extract the username and password and store them in separate variables
+    set_fact:
+     zabbix_agent_pg_username: "{{ zabbix_agent_pg_user.data.data.username }}"
+     zabbix_agent_pg_password: "{{ zabbix_agent_pg_user.data.data.password }}"
+
+  - name: Ensure ACL package is installed
+    package:
+       name: acl
+       state: present
+

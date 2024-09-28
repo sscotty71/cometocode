@@ -9,7 +9,7 @@ mioio_exe_dir           : "/usr/local/bin"
 conf_minio_volumnes          : "{{ minio_data }}"
 conf_minio_opts              :  "--console-address :9001 --certs-dir={{ mioio_certs_dir }}"
 conf_minio_root_user         : "scotty"
-conf_minio_root_password     : "linuxtime"
+conf_minio_root_password     : "cometocode"
 conf_minio_server_url        : "https://{{ server_ip }}:{{ server_port }}"
 conf_mioio_conf_file         : "/etc/default/minio.conf"
 #------------- SERVICE ----------------------

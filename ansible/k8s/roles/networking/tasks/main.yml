@@ -1,0 +1,5 @@
+- name: Installare Flannel come CNI
+  ansible.builtin.shell: |
+    kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  environment:
+    KUBECONFIG: /root/.kube/config

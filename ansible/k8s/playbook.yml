@@ -1,0 +1,23 @@
+- name: Configurare i nodi Kubernetes
+  hosts: all
+  become: yes
+  roles:
+    - common
+
+- name: Configurare il master Kubernetes
+  hosts: master
+  become: yes
+  roles:
+    - k8s-master
+
+- name: Configurare i worker Kubernetes
+  hosts: workers
+  become: yes
+  roles:
+    - k8s-worker
+
+- name: Configurare la rete CNI
+  hosts: master
+  become: yes
+  roles:
+    - networking

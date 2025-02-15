@@ -1,0 +1,6 @@
+- name: Configurare il server
+  hosts: prometheus
+  become: yes
+  roles:
+    - server
+

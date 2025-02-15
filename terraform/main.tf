@@ -14,9 +14,9 @@ module "proxmox_pool" {
 module "proxmox_vms" {
   source           = "./modules/proxmox_vm"
 
-  ssh_pve_username = data.vault_kv_secret_v2.proxmox-ssh.data["username"]
-  ssh_pve_passwd   = data.vault_kv_secret_v2.proxmox-ssh.data["password"]
-  ssh_pve_host     = data.vault_kv_secret_v2.proxmox-ssh.data["host"]
+  # ssh_pve_username = data.vault_kv_secret_v2.proxmox-ssh.data["username"]
+  # ssh_pve_passwd   = data.vault_kv_secret_v2.proxmox-ssh.data["password"]
+  # ssh_pve_host     = data.vault_kv_secret_v2.proxmox-ssh.data["host"]
 
   pool             = var.TARGET_POOL
   vm_count         = length(local.vms)
@@ -25,12 +25,12 @@ module "proxmox_vms" {
   depends_on       = [module.proxmox_pool]
 }
 
-module "ansible_inventory" {
-  source        = "./modules/ansible_inventory"
-  filename      = "../inventory.yml"
-  template_file = "./modules/ansible_inventory/templates/inventory.tpl"
-  vms           = local.vms
-}
+# module "ansible_inventory" {
+#   source        = "./modules/ansible_inventory"
+#   filename      = "../inventory.yml"
+#   template_file = "./modules/ansible_inventory/templates/inventory.tpl"
+
+# }
 
 
 #Terraform distruggerà le risorse in ordine inverso rispetto alla creazione.

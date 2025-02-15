@@ -1,10 +1,10 @@
 # modules/proxmox_pool/main.tf
 
-resource "proxmox_pool" "come-to-code" {
-  poolid  = "come-to-code" 
-  comment = "Example of a pool to come-to-code"
+resource "proxmox_pool" "ansible-test" {
+  poolid  = "ansible-test" 
+  comment = "Example of a pool to ansible-test"
 }
 
 output "pool_id" {
-  value = proxmox_pool.come-to-code.id
+  value = proxmox_pool.ansible-test.id
 }

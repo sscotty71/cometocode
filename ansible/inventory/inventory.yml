@@ -1,0 +1,24 @@
+all:
+  hosts:
+    master:
+      ansible_host: 192.168.173.150  # IP del master
+      ansible_user: stefano
+
+    worker1:
+      ansible_host: 192.168.173.151  # IP worker 1
+      ansible_user: stefano
+    worker2:
+      ansible_host: 192.168.173.152  # IP worker 2
+      ansible_user: stefano
+
+    prometheus:
+      ansible_host: 192.168.173.153  # IP del master
+      ansible_user: stefano
+  children:
+    masters:
+      hosts:
+        master:
+    workers:
+      hosts:
+        worker1:
+        worker2:

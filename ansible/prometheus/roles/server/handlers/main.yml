@@ -1,0 +1,4 @@
+---
+- name: Ricarica systemd
+  command: systemctl daemon-reload
+  become: yes

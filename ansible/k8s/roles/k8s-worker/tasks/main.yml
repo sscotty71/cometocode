@@ -1,0 +1,10 @@
+- name: Ottenere il token dal master
+  ansible.builtin.shell: kubeadm token create --print-join-command
+  delegate_to: master
+  register: join_command
+  run_once: true
+
+- name: Unire il worker al cluster
+  ansible.builtin.shell: "{{ join_command.stdout }}"
+  args:
+    executable: /bin/bash
